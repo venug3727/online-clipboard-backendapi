@@ -35,7 +35,7 @@ supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 @app.get("/")
 def wel():
     return {
-        'data':"welcome"
+        'data':"welcome with 2"
     }
 # Include routers
 from routers import clipboard, files, urls
