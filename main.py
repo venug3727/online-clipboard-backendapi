@@ -30,7 +30,11 @@ if not SUPABASE_URL or not SUPABASE_KEY:
 
 # Supabase client
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
-
+@app.get("/")
+def wel():
+    return {
+        'data':"welcome"
+    }
 # Include routers
 from routers import clipboard, files, urls
 app.include_router(clipboard.router, prefix="/api/clipboard", tags=["Clipboard"])
