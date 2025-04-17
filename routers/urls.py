@@ -56,7 +56,7 @@ async def shorten_url(url_data: URLData):
         raise HTTPException(status_code=500, detail="Failed to create short URL")
     
     return {
-        "short_url": f"https://bmsclipboard.netlify.app/{short_path}",  # Changed to full URL
+        "short_url": f"https://bmsclipboard.vercel.app/{short_path}",  # Changed to full URL
         "original_url": url_data.url
     }
 
