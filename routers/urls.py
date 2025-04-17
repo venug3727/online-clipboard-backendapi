@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+git from fastapi import APIRouter, HTTPException
 from datetime import datetime, timedelta
 import secrets
 from fastapi.responses import RedirectResponse
@@ -68,7 +68,12 @@ async def redirect_short_url(short_path: str):
         .eq("short_path", short_path) \
         .execute()
     
+    print(f"Looking up path: {short_path}")  # Debug logging
+    
     if not result.data:
+        print("Path not found")  # Debug logging
         raise HTTPException(status_code=404, detail="Short URL not found")
     
-    return RedirectResponse(url=result.data[0]["original_url"])
+    original_url = result.data[0]["original_url"]
+    print(f"Redirecting to: {original_url}")  # Debug logging
+    return RedirectResponse(url=original_url)
