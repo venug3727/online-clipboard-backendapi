@@ -56,24 +56,18 @@ async def shorten_url(url_data: URLData):
         raise HTTPException(status_code=500, detail="Failed to create short URL")
     
     return {
-        "short_url": f"https://bmsclipboard.vercel.app/{short_path}",  # Changed to full URL
+        "short_url": f"https://online-clipboard-backendapi.vercel.app/{short_path}",  # Changed to Netlify domain
         "original_url": url_data.url
     }
 
 @router.get("/{short_path}")
 async def redirect_short_url(short_path: str):
-    # Look up the original URL
     result = supabase.table("short_urls") \
         .select("original_url") \
         .eq("short_path", short_path) \
         .execute()
     
-    print(f"Looking up path: {short_path}")  # Debug logging
-    
     if not result.data:
-        print("Path not found")  # Debug logging
         raise HTTPException(status_code=404, detail="Short URL not found")
     
-    original_url = result.data[0]["original_url"]
-    print(f"Redirecting to: {original_url}")  # Debug logging
-    return RedirectResponse(url=original_url)
+    return RedirectResponse(url=result.data[0]["original_url"])
