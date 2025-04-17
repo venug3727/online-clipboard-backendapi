@@ -1,4 +1,4 @@
-git from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException
 from datetime import datetime, timedelta
 import secrets
 from fastapi.responses import RedirectResponse
