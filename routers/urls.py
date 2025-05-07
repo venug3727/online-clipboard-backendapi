@@ -56,7 +56,7 @@ async def shorten_url(url_data: URLData):
         raise HTTPException(status_code=500, detail="Failed to create short URL")
     
     return {
-        "short_url": f"https://online-clipboard-backendapi.vercel.app/api/urls/{short_path}",  # Changed to Netlify domain
+        "short_url": f"https://clip.vgcs.online/{short_path}",  # Changed to Netlify domain
         "original_url": url_data.url
     }
 
