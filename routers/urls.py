@@ -56,7 +56,7 @@ async def shorten_url(url_data: URLData):
         raise HTTPException(status_code=500, detail="Failed to create short URL")
     
     return {
-        "short_url": f"https://clip.vgcs.online/{short_path}",  # Changed to direct path
+        "short_url": f"https://clip.vgcs.online/api/urls/{short_path}",  # Changed to direct path
         "original_url": url_data.url
     }
 
