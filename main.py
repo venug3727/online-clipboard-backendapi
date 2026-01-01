@@ -24,7 +24,7 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:5173",
         "http://localhost:5174", 
-        "https://bmsclipboard.netlify.app",
+        "https://cloudclip.netlify.app",
         "https://bmsclipboard.vgcs.online"
     ],
     allow_credentials=True,
