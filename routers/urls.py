@@ -1,18 +1,18 @@
 from fastapi import APIRouter, HTTPException
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import secrets
 from fastapi.responses import RedirectResponse
-from supabase import create_client
-import os
 from pydantic import BaseModel
+
+from database import short_urls_collection
 
 router = APIRouter()
 
-supabase = create_client(os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_KEY"))
 
 class URLData(BaseModel):
     url: str
     custom_path: str | None = None
+
 
 @router.post("/shorten")
 async def shorten_url(url_data: URLData):
@@ -36,38 +36,30 @@ async def shorten_url(url_data: URLData):
     short_path = url_data.custom_path or secrets.token_urlsafe(6)
     
     # Check if path exists
-    existing = supabase.table("short_urls") \
-        .select("*") \
-        .eq("short_path", short_path) \
-        .execute()
+    existing = await short_urls_collection.find_one({"short_path": short_path})
     
-    if existing.data:
+    if existing:
         raise HTTPException(status_code=400, detail="This custom path is already taken")
     
-    # Save to Supabase
-    result = supabase.table("short_urls").insert({
+    # Save to MongoDB
+    await short_urls_collection.insert_one({
         "original_url": url_data.url,
         "short_path": short_path,
-        "expires_at": (datetime.utcnow() + timedelta(days=365)).isoformat(),
-        "created_at": datetime.utcnow().isoformat()
-    }).execute()
-    
-    if not result.data:
-        raise HTTPException(status_code=500, detail="Failed to create short URL")
+        "expires_at": datetime.now(timezone.utc) + timedelta(days=365),
+        "created_at": datetime.now(timezone.utc)
+    })
     
     return {
-        "short_url": f"https://clip.vgcs.online/api/urls/{short_path}",  # Changed to direct path
+        "short_url": f"https://clip.vgcs.online/api/urls/{short_path}",
         "original_url": url_data.url
     }
 
+
 @router.get("/{short_path}")
 async def redirect_short_url(short_path: str):
-    result = supabase.table("short_urls") \
-        .select("original_url") \
-        .eq("short_path", short_path) \
-        .execute()
+    result = await short_urls_collection.find_one({"short_path": short_path})
     
-    if not result.data:
+    if not result:
         raise HTTPException(status_code=404, detail="Short URL not found")
     
-    return RedirectResponse(url=result.data[0]["original_url"])
+    return RedirectResponse(url=result["original_url"])

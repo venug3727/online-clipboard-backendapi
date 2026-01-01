@@ -1,13 +1,22 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from supabase import create_client, Client
+from contextlib import asynccontextmanager
 from dotenv import load_dotenv
 import os
 
 # Load environment variables from .env file
 load_dotenv()
 
-app = FastAPI()
+from database import create_indexes
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup: Create indexes
+    await create_indexes()
+    yield
+    # Shutdown: Nothing needed for now
+
+app = FastAPI(lifespan=lifespan)
 
 # CORS Configuration
 app.add_middleware(
@@ -24,20 +33,12 @@ app.add_middleware(
     expose_headers=["*"]
 )
 
-# Verify environment variables are loaded
-SUPABASE_URL = os.getenv("SUPABASE_URL")
-SUPABASE_KEY = os.getenv("SUPABASE_KEY")
-
-if not SUPABASE_URL or not SUPABASE_KEY:
-    raise ValueError("Missing Supabase configuration in environment variables")
-
-# Supabase client
-supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 @app.get("/")
 def wel():
     return {
-        'data':"welcome with 2"
+        'data': "welcome with MongoDB"
     }
+
 # Include routers
 from routers import clipboard, files, urls
 app.include_router(clipboard.router, prefix="/api/clipboard", tags=["Clipboard"])

@@ -1,0 +1,100 @@
+### ===================================
+### Online Clipboard API - Test Endpoints
+### ===================================
+
+@baseUrl = http://127.0.0.1:8000
+
+### ===================================
+### ROOT - Health Check
+### ===================================
+
+### Test root endpoint
+GET {{baseUrl}}/
+
+### ===================================
+### CLIPBOARD ENDPOINTS
+### ===================================
+
+### Send clipboard content (plain text)
+POST {{baseUrl}}/api/clipboard/send
+Content-Type: application/json
+
+{
+    "content": "Hello, this is a test clipboard content!",
+    "content_type": "text",
+    "is_confidential": false
+}
+
+###
+
+### Send confidential clipboard content (encrypted)
+POST {{baseUrl}}/api/clipboard/send
+Content-Type: application/json
+
+{
+    "content": "This is a secret message!",
+    "content_type": "text",
+    "is_confidential": true,
+    "encryption_key": "mysecretkey123"
+}
+
+###
+
+### Receive clipboard content (replace CODE with actual 4-digit code)
+POST {{baseUrl}}/api/clipboard/receive
+Content-Type: application/json
+
+{
+    "code": "1234"
+}
+
+###
+
+### Receive confidential clipboard content (with decryption key)
+POST {{baseUrl}}/api/clipboard/receive
+Content-Type: application/json
+
+{
+    "code": "1234",
+    "decryption_key": "mysecretkey123"
+}
+
+### ===================================
+### URL SHORTENER ENDPOINTS
+### ===================================
+
+### Shorten URL (auto-generated path)
+POST {{baseUrl}}/api/urls/shorten
+Content-Type: application/json
+
+{
+    "url": "https://www.google.com/search?q=hello+world"
+}
+
+###
+
+### Shorten URL (custom path)
+POST {{baseUrl}}/api/urls/shorten
+Content-Type: application/json
+
+{
+    "url": "https://github.com",
+    "custom_path": "mygithub"
+}
+
+###
+
+### Redirect short URL (replace SHORT_PATH with actual path)
+GET {{baseUrl}}/api/urls/mygithub
+
+### ===================================
+### FILE SHARING ENDPOINTS
+### ===================================
+
+### Get file info by share code (replace CODE with actual 4-digit code)
+GET {{baseUrl}}/api/files/files/1234
+
+###
+
+### Download file by share code (replace CODE with actual 4-digit code)
+GET {{baseUrl}}/api/files/download/1234
